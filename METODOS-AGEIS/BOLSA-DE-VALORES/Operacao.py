@@ -53,8 +53,8 @@ class funcoes:
         print('Banco de dados criado com sucesso!')
         self.desconecta_banco()
     
-    def adicionar_operacao(self):
-        self.id_oper = self.entrada_id_operacao.get()
+    def variaveis(self):
+		self.id_oper = self.entrada_id_operacao.get()
         self.cod_ativo = self.entrada_codigo_ativo.get()
         self.data = f'{self.entrada_ano.get()}-{self.entrada_mes.get()}-{self.entrada_dia.get()}'
         # self.dia = self.entrada_dia.get()
@@ -66,7 +66,9 @@ class funcoes:
         # self.taxa_corr = self.entrada_taxa_corretagem.get()
         # self.tx_b3 = self.entrada_taxa_b3.get()
         self.valor_op = self.calculo_operacao()
-        
+	
+	def adicionar_operacao(self):
+        self.variaveis()        
         self.conectar_banco()
         
         self.cursor.execute('''INSERT INTO operacoes(codigo_operacao, data, qtd_acoes, valor_unitario, tipo_operacao, taxa_corretagem, taxa_b3, valor_operacao)
@@ -86,6 +88,31 @@ class funcoes:
         for elemento in lista:
             self.lista_operacoes.insert('', END, values=elemento)
         self.desconectar_banco()
+	
+	def duplo_clique(self, event):
+		self.limpar_tela()
+		self.lista_operacoes.selection()
+		
+		for item in self.lista_operacoes.selection():
+			col1, col2, col3, col4, col5, col6, col7, col8, col9 = self.lista_operacoes.item(n, 'values')
+			self.entrada_id_operacao.insert(END, col1)
+			self.entrada_codigo_ativo.insert(END, col2)
+			self.entrada_data.insert(END, col3)
+			self.entrada_qtd_acoes.insert(END, col4)
+			self.entrada_valor_unitario.insert(END, col5)
+			self.entrada_tipo_operacao.insert(END, col6)
+			self.entrada_taxa_corretagem.insert(END, col7)
+			self.entrada_taxa_b3.insert(END, col8)
+			self.calculo_operacao.insert(END, col9)
+	
+	def apagar_operacao(self):
+		self.variaveis()
+		self.conectar_banco()
+		self.conector.execute('''DELETE FROM operacoes WHERE id_operacao = ?''', (self.id_oper))
+		self.conector.commit()
+		self.desconectar_banco()
+		self.limpar_tela()
+		self.select_lista()
 
 class aplicativo(funcoes):
     def __init__(self):
@@ -133,7 +160,7 @@ class aplicativo(funcoes):
         self.btn_alterar.place(relx=0.7, rely=0.1, relwidth=0.1, relheight=0.15)
 
         # criação do botão apagar
-        self.btn_apagar = Button(self.frame_1, text='Apagar',bd=2, bg='#107db2', fg='white', font=('verdana', 8, 'bold'))
+        self.btn_apagar = Button(self.frame_1, text='Apagar',bd=2, bg='#107db2', fg='white', font=('verdana', 8, 'bold'), command=self.apagar_operacao)
         self.btn_apagar.place(relx=0.8, rely=0.1, relwidth=0.1, relheight=0.15)
 
         # LABELS =================================================================================
@@ -241,11 +268,13 @@ class aplicativo(funcoes):
         self.lista_operacoes.column('#8', width=50)
         self.lista_operacoes.column('#9', width=100)
         
-        self.lista_operacao.place(relx=0.01, rely=0.1, relwidth=0.95, relheight=0.85)
+        self.lista_operacoes.place(relx=0.01, rely=0.1, relwidth=0.95, relheight=0.85)
         
         # criação da barra de rolagem
         self.barra_rolagem = Scrollbar(self.frame_2, orient='vertical')
         self.lista_operacoes.configure(yscroll=self.barra_rolagem.set)
         self.barra_rolagem.place(relx=0.96, rely=0.1, relwidth=0.02, relheight=0.85)
+		
+		self.lista_operacoes.bind('<Double1>', self.duplo_clique)
         
 aplicativo()
