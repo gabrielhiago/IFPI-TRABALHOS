@@ -1,40 +1,80 @@
 from tkinter import *
 from tkinter import ttk
-from tkcalendar import Calendar
-import sqlite3  # instalar o banco de dados no python usando pip
-from datetime import date
+# from tkcalendar import Calendar
+import sqlite3
+# from datetime import date
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.pdfbase import pdfmetrics
+from reportlab.platypus import SimpleDocTemplate, Image
+import webbrowser
 
 janela = Tk()
 
+class relatorios():
+    def imprimir_operacao(self):
+        webbrowser.open('operacao.pdf')
+
+    def relatorio_operacao(self):
+        self.operacao = canvas.Canvas('operacao.pdf')
+
+        self.relat_id_oper = self.entrada_id_operacao.get()
+        self.relat_cod_ativo = self.entrada_codigo_ativo.get()
+        self.relat_data = self.entrada_data.get()
+        self.relat_qtd = self.entrada_qtd_acoes.get()
+        self.relat_valor_unt = self.entrada_valor_unitario.get()
+        self.relat_tipo_op = self.entrada_tipo_operacao.get().upper()
+        self.relat_taxa_corr = self.entrada_taxa_corretagem.get()
+        self.relat_tx_b3 = self.entrada_taxa_b3.get()
+        self.relat_valor_op = self.calculo_operacao()
+
+        self.operacao.setFont('Helvetica-Bold', 20)
+        self.operacao.drawString(200, 790, 'Ficha de Operação')
+
+        self.operacao.setFont('Helvetica-Bold', 15)
+        self.operacao.drawString(50, 700, 'Id Operação')
+        self.operacao.drawString(50, 680, 'Cód Ativo')
+        self.operacao.drawString(50, 660, 'Data Operação')
+        self.operacao.drawString(50, 640, 'Quantidade Ações')
+        self.operacao.drawString(50, 620, 'Valor Unitário')
+        self.operacao.drawString(50, 600, 'Tipo Operação')
+        self.operacao.drawString(50, 580, 'Taxa Corretagem')
+        self.operacao.drawString(50, 560, 'Taxa B3')
+        self.operacao.drawString(50, 540, 'Valor Operação')
+
+        self.operacao.setFont('Helvetica-Bold', 15)
+        self.operacao.drawString(180, 700, self.relat_id_oper)
+        self.operacao.drawString(180, 680, self.relat_cod_ativo)
+        self.operacao.drawString(180, 660, self.relat_data)
+        self.operacao.drawString(180, 640, self.relat_qtd)
+        self.operacao.drawString(180, 620, self.relat_valor_unt)
+        self.operacao.drawString(180, 600, self.relat_tipo_op)
+        self.operacao.drawString(180, 580, self.relat_taxa_corr)
+        self.operacao.drawString(180, 560, self.relat_tx_b3)
+        self.operacao.drawString(180, 5400, self.relat_valor_op)
+
+        self.operacao.rect(20, 550, 550, 2, fill=True, stroke=False)
+
+        self.operacao.showPage()
+        self.operacao.save()
+        self.imprimir_operacao()
 
 class funcoes:
-    def auto_incrementar(self):
-        self.entrada_id_operacao.get() = 0
-        inicio = 1
-        intervalo = 1
-        if self.entrada_id_operacao.get() == 0:
-            self.entrada_id_operacao = inicio
-        else:
-            self.entrada_id_operacao += intervalo
-        
-        return self.entrada_id_operacao
-
     def calculo_operacao(self):
-        self.variaveis()
         if self.entrada_tipo_operacao.get().upper() == 'COMPRA':
-            self.valor_operacao = (self.qtd * self.valor_unt) + (self.taxa_corr + self.tx_b3)
+            return  (float(self.entrada_qtd_acoes.get()) * float(self.entrada_valor_unitario.get())) + (float(self.entrada_taxa_corretagem.get()) + float(self.entrada_taxa_b3.get()))
         if self.entrada_tipo_operacao.get().upper() == 'VENDA':
-            self.valor_operacao = (self.qtd * self.valor_unt) - (self.taxa_corr + self.tx_b3)
-        return self.valor_operacao
+            return  (float(self.entrada_qtd_acoes.get()) * float(self.entrada_valor_unitario.get())) - (float(self.entrada_taxa_corretagem.get()) + float(self.entrada_taxa_b3.get()))
 
     def limpar_tela(self):
         self.entrada_id_operacao.delete(0, END)
         self.entrada_codigo_ativo.delete(0, END)
+        self.entrada_data.delete(0, END)
         self.entrada_qtd_acoes.delete(0, END)
         self.entrada_valor_unitario.delete(0, END)
-        self.entrada_dia.delete(0, END)
+        '''self.entrada_dia.delete(0, END)
         self.entrada_mes.delete(0, END)
-        self.entrada_ano.delete(0, END)
+        self.entrada_ano.delete(0, END)'''
         self.entrada_tipo_operacao.delete(0, END)
         self.entrada_taxa_corretagem.delete(0, END)
         self.entrada_taxa_b3.delete(0, END)
@@ -70,10 +110,11 @@ class funcoes:
     def variaveis(self):
         self.id_oper = self.entrada_id_operacao.get()
         self.cod_ativo = self.entrada_codigo_ativo.get()
-        self.data = self.data_operacao
+        self.data = self.entrada_data.get()
+        #self.data = self.data_operacao
         self.qtd = self.entrada_qtd_acoes.get()
         self.valor_unt = self.entrada_valor_unitario.get()
-        self.tipo_op = self.entrada_tipo_operacao.get()
+        self.tipo_op = self.entrada_tipo_operacao.get().upper()
         self.taxa_corr = self.entrada_taxa_corretagem.get()
         self.tx_b3 = self.entrada_taxa_b3.get()
         self.valor_op = self.calculo_operacao()
@@ -85,12 +126,12 @@ class funcoes:
 
         self.cursor.execute('''INSERT INTO operacoes(codigo_operacao, data, qtd_acoes, valor_unitario, tipo_operacao, taxa_corretagem, taxa_b3, valor_operacao)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (self.cod_ativo, self.data, self.qtd, self.valor_unt, self.tipo_op, self.taxa_corr, self.tx_b3, self.valor_op))
+            ''', (
+        self.cod_ativo, self.data, self.qtd, self.valor_unt, self.tipo_op, self.taxa_corr, self.tx_b3, self.valor_op))
         self.conector.commit()
         self.desconectar_banco()
         self.select_lista()
         self.limpar_tela()
-
 
     def select_lista(self):
         self.lista_operacoes.delete(*self.lista_operacoes.get_children())
@@ -110,13 +151,12 @@ class funcoes:
             col1, col2, col3, col4, col5, col6, col7, col8, col9 = self.lista_operacoes.item(termo, 'values')
             self.entrada_id_operacao.insert(END, col1)
             self.entrada_codigo_ativo.insert(END, col2)
-            self.data_operacao.insert(END, col3)
+            self.entrada_data.insert(END, col3)
             self.entrada_qtd_acoes.insert(END, col4)
             self.entrada_valor_unitario.insert(END, col5)
             self.entrada_tipo_operacao.insert(END, col6)
             self.entrada_taxa_corretagem.insert(END, col7)
             self.entrada_taxa_b3.insert(END, col8)
-            self.calculo_operacao.insert(END, col9)
 
     def apagar_operacao(self):
         self.variaveis()
@@ -127,8 +167,18 @@ class funcoes:
         self.limpar_tela()
         self.select_lista()
 
+    def alterar_operacao(self):
+        self.variaveis()
+        self.conectar_banco()
+        self.cursor.execute('''UPDATE operacoes SET codigo_operacao = ?, data = ?, qtd_acoes = ?, valor_unitario = ?, tipo_operacao = ?, taxa_corretagem = ?, taxa_b3 = ?, valor_operacao = ?
+            WHERE id_operacao = ?
+        ''', (self.cod_ativo, self.data, self.qtd, self.valor_unt, self.tipo_op, self.taxa_corr, self.tx_b3, self.valor_op, self.id_oper))
+        self.conector.commit()
+        self.desconectar_banco()
+        self.select_lista()
+        self.limpar_tela()
 
-class aplicativo(funcoes):
+class aplicativo(funcoes, relatorios):
     def __init__(self):
         self.janela = janela
         self.tela()
@@ -137,6 +187,7 @@ class aplicativo(funcoes):
         self.widgets_frame_2()
         self.criar_tabela()
         self.select_lista()
+        self.menus()
         janela.mainloop()
 
     def tela(self):
@@ -166,11 +217,11 @@ class aplicativo(funcoes):
         self.btn_buscar.place(relx=0.4, rely=0.1, relwidth=0.1, relheight=0.15)
 
         # criação do botão novo
-        self.btn_novo = Button(self.frame_1, text='Novo', bd=2, bg='#107db2', fg='white', font=('verdana', 8, 'bold'), command=self.adicionar_operacao)
-        self.btn_novo.place(relx=0.6, rely=0.1, relwidth=0.1, relheight=0.15)
+        self.btn_guardar = Button(self.frame_1, text='Guardar', bd=2, bg='#107db2', fg='white', font=('verdana', 8, 'bold'), command=self.adicionar_operacao)
+        self.btn_guardar.place(relx=0.6, rely=0.1, relwidth=0.1, relheight=0.15)
 
         # criação do botão alterar
-        self.btn_alterar = Button(self.frame_1, text='Alterar', bd=2, bg='#107db2', fg='white', font=('verdana', 8, 'bold'))
+        self.btn_alterar = Button(self.frame_1, text='Alterar', bd=2, bg='#107db2', fg='white', font=('verdana', 8, 'bold'), command=self.alterar_operacao)
         self.btn_alterar.place(relx=0.7, rely=0.1, relwidth=0.1, relheight=0.15)
 
         # criação do botão apagar
@@ -183,7 +234,7 @@ class aplicativo(funcoes):
         self.label_id_operacao = Label(self.frame_1, text='ID Oper.', bg='#dfe3ee', fg='#1e3743')
         self.label_id_operacao.place(relx=0.19, rely=0.05)
 
-        self.entrada_id_operacao = self.auto_incrementar()
+        self.entrada_id_operacao = Entry(self.frame_1)
         self.entrada_id_operacao.place(relx=0.19, rely=0.15, relwidth=0.10)
 
         # criação do label código ativo
@@ -213,15 +264,15 @@ class aplicativo(funcoes):
 
         self.entrada_dia = Entry(self.frame_1)
         self.entrada_dia.place(relx=0.05, rely=0.64, relwidth=0.08)'''
-        
+
         # criação do label data
-        self.label_data = Label(self.frame_1, text='Dia', bg='#dfe3ee', fg='#1e3743')
+        self.label_data = Label(self.frame_1, text='Data', bg='#dfe3ee', fg='#1e3743')
         self.label_data.place(relx=0.05, rely=0.54)
 
-        self.entrada_data = Calendar(self.frame_1, selectmode='day', year=2022, month=1, day=1)
-        self.entrada_data.place(relx=0.05, rely=0.64, relwidth=0.08)
-        
-        self.data_operacao = date.srtftime(self.entrada_data.get_date(), '%Y-%m-%d')
+        self.entrada_data = Entry(self.frame_1)
+        self.entrada_data.place(relx=0.05, rely=0.64, relwidth=0.4)
+
+        # self.data_operacao = date.strftime(self.entrada_data.get_date(), '%Y-%m-%d')
 
         '''lista_dias = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31]
         self.entrada_dia = ttk.Combobox(self.frame_1, values=lista_dias)
@@ -247,7 +298,7 @@ class aplicativo(funcoes):
         self.entrada_ano = Entry(self.frame_1)
         self.entrada_ano.place(relx=0.25, rely=0.64, relwidth=0.08)
 
-        self.data_operacao = f'{self.entrada_ano.get()}-{self.entrada_mes.get()}-{self.entrada_dia.get()}''''
+        self.data_operacao = f'{self.entrada_ano.get()}-{self.entrada_mes.get()}-{self.entrada_dia.get()}'''
 
         # criação do label tipo de operação
         self.label_tipo_operacao = Label(self.frame_1, text='Tipo de Operação', bg='#dfe3ee', fg='#1e3743')
@@ -310,5 +361,21 @@ class aplicativo(funcoes):
 
         self.lista_operacoes.bind('<Double-1>', self.duplo_clique)
 
+    def menus(self):
+        barra_menu = Menu(self.janela)
+        self.janela.config(menu=barra_menu)
+        menu_item1 = Menu(barra_menu)
+        menu_item2 = Menu(barra_menu)
+        menu_item3 = Menu(barra_menu)
+
+        def sair(): self.janela.destroy()
+
+        barra_menu.add_cascade(label='Opções', menu=menu_item1)
+        barra_menu.add_cascade(label='Relatórios', menu=menu_item2)
+        barra_menu.add_cascade(label='Sobre', menu=menu_item3)
+
+        menu_item1.add_command(label='Sair', command=sair)
+        menu_item1.add_command(label='Limpar Tela', command=self.limpar_tela)
+        menu_item2.add_command(label='Ficha da Operação', command=self.relatorio_operacao)
 
 aplicativo()
