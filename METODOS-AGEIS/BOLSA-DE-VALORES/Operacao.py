@@ -13,10 +13,11 @@ class funcoes:
         return self.entrada_id_operacao'''
 
     def calculo_operacao(self):
+        self.variaveis()
         if self.entrada_tipo_operacao.get().upper() == 'COMPRA':
-            self.valor_operacao = 1
+            self.valor_operacao = (self.qtd * self.valor_unt) + (self.taxa_corr + self.tx_b3)
         if self.entrada_tipo_operacao.get().upper() == 'VENDA':
-            self.valor_operacao = 0
+            self.valor_operacao = (self.qtd * self.valor_unt) - (self.taxa_corr + self.tx_b3)
         return self.valor_operacao
 
     def limpar_tela(self):
@@ -199,17 +200,26 @@ class aplicativo(funcoes):
         self.entrada_valor_unitario = Entry(self.frame_1)
         self.entrada_valor_unitario.place(relx=0.5, rely=0.41, relwidth=0.4)
 
-        # criação do label dia
+        '''criação do label dia
         self.label_dia = Label(self.frame_1, text='Dia', bg='#dfe3ee', fg='#1e3743')
         self.label_dia.place(relx=0.05, rely=0.54)
 
         self.entrada_dia = Entry(self.frame_1)
-        self.entrada_dia.place(relx=0.05, rely=0.64, relwidth=0.08)
+        self.entrada_dia.place(relx=0.05, rely=0.64, relwidth=0.08)'''
+        
+        # criação do label data
+        self.label_data = Label(self.frame_1, text='Dia', bg='#dfe3ee', fg='#1e3743')
+        self.label_data.place(relx=0.05, rely=0.54)
+
+        self.entrada_data = Calendar(self.frame_1, selectmode='day', year=2022, month=1, day=1)
+        self.entrada_data.place(relx=0.05, rely=0.64, relwidth=0.08)
+        
+        self.data_operacao = date.srtftime(self.entrada_data.get_date(), '%Y-%m-%d')
 
         '''lista_dias = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31]
         self.entrada_dia = ttk.Combobox(self.frame_1, values=lista_dias)
         self.entrada_dia.set(1)
-        self.entrada_dia.place(relx=0.05, rely=0.64, relwidth=0.08)'''
+        self.entrada_dia.place(relx=0.05, rely=0.64, relwidth=0.08)
 
         # criação do label mes
         self.label_mes = Label(self.frame_1, text='Mes', bg='#dfe3ee', fg='#1e3743')
@@ -218,10 +228,10 @@ class aplicativo(funcoes):
         self.entrada_mes = Entry(self.frame_1)
         self.entrada_mes.place(relx=0.15, rely=0.64, relwidth=0.08)
 
-        '''lista_meses = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        lista_meses = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
         self.entrada_mes = ttk.Combobox(self.frame_1, values=lista_meses)
         self.entrada_mes.set(1)
-        self.entrada_mes.place(relx=0.15, rely=0.64, relwidth=0.08)'''
+        self.entrada_mes.place(relx=0.15, rely=0.64, relwidth=0.08)
 
         # criação do label ano
         self.label_ano = Label(self.frame_1, text='Ano', bg='#dfe3ee', fg='#1e3743')
@@ -230,7 +240,7 @@ class aplicativo(funcoes):
         self.entrada_ano = Entry(self.frame_1)
         self.entrada_ano.place(relx=0.25, rely=0.64, relwidth=0.08)
 
-        self.data_operacao = f'{self.entrada_ano.get()}-{self.entrada_mes.get()}-{self.entrada_dia.get()}'
+        self.data_operacao = f'{self.entrada_ano.get()}-{self.entrada_mes.get()}-{self.entrada_dia.get()}''''
 
         # criação do label tipo de operação
         self.label_tipo_operacao = Label(self.frame_1, text='Tipo de Operação', bg='#dfe3ee', fg='#1e3743')
