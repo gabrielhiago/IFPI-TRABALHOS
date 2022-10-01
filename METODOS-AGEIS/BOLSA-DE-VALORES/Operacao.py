@@ -8,9 +8,16 @@ janela = Tk()
 
 
 class funcoes:
-    '''def id_op(self):
-        self.entrada_id_operacao += 1
-        return self.entrada_id_operacao'''
+    def auto_incrementar(self):
+        self.entrada_id_operacao.get() = 0
+        inicio = 1
+        intervalo = 1
+        if self.entrada_id_operacao.get() == 0:
+            self.entrada_id_operacao = inicio
+        else:
+            self.entrada_id_operacao += intervalo
+        
+        return self.entrada_id_operacao
 
     def calculo_operacao(self):
         self.variaveis()
@@ -176,7 +183,7 @@ class aplicativo(funcoes):
         self.label_id_operacao = Label(self.frame_1, text='ID Oper.', bg='#dfe3ee', fg='#1e3743')
         self.label_id_operacao.place(relx=0.19, rely=0.05)
 
-        self.entrada_id_operacao = Entry(self.frame_1)
+        self.entrada_id_operacao = self.auto_incrementar()
         self.entrada_id_operacao.place(relx=0.19, rely=0.15, relwidth=0.10)
 
         # criação do label código ativo
