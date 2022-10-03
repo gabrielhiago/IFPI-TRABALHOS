@@ -11,7 +11,7 @@ import webbrowser
 
 janela = Tk()
 
-class relatorios():
+'''class relatorios():
     def imprimir_operacao(self):
         webbrowser.open('operacao.pdf')
 
@@ -57,7 +57,7 @@ class relatorios():
 
         self.operacao.showPage()
         self.operacao.save()
-        self.imprimir_operacao()
+        self.imprimir_operacao()'''
 
 class funcoes:
     def calculo_operacao(self):
@@ -178,7 +178,23 @@ class funcoes:
         self.select_lista()
         self.limpar_tela()
 
-class aplicativo(funcoes, relatorios):
+    def buscar_operacao(self):
+        self.conectar_banco()
+        self.lista_operacoes.delete(*self.lista_operacoes.get_children())
+
+        self.entrada_codigo_ativo.insert(END, '%')
+        cod_do_ativo = self.entrada_codigo_ativo.get()
+        self.cursor.execute("""SELECT id_operacao, codigo_operacao, data, qtd_acoes, valor_unitario, tipo_operacao, taxa_corretagem, taxa_b3, valor_operacao FROM operacoes
+                        WHERE codigo_operacao LIKE '%s' ORDER BY codigo_operacao ASC
+                    """ % cod_do_ativo)
+
+        buscar_ativo = self.cursor.fetchall()
+        for op in buscar_ativo:
+            self.lista_operacoes.insert('', END, values=op)
+        self.limpar_tela()
+        self.desconectar_banco()
+
+class aplicativo(funcoes):
     def __init__(self):
         self.janela = janela
         self.tela()
@@ -213,7 +229,7 @@ class aplicativo(funcoes, relatorios):
         self.btn_limpar.place(relx=0.3, rely=0.1, relwidth=0.1, relheight=0.15)
 
         # criação do botão buscar
-        self.btn_buscar = Button(self.frame_1, text='Buscar', bd=2, bg='#107db2', fg='white', font=('verdana', 8, 'bold'))
+        self.btn_buscar = Button(self.frame_1, text='Buscar', bd=2, bg='#107db2', fg='white', font=('verdana', 8, 'bold'),command=self.buscar_operacao)
         self.btn_buscar.place(relx=0.4, rely=0.1, relwidth=0.1, relheight=0.15)
 
         # criação do botão novo
@@ -371,11 +387,12 @@ class aplicativo(funcoes, relatorios):
         def sair(): self.janela.destroy()
 
         barra_menu.add_cascade(label='Opções', menu=menu_item1)
-        barra_menu.add_cascade(label='Relatórios', menu=menu_item2)
-        barra_menu.add_cascade(label='Sobre', menu=menu_item3)
+        barra_menu.add_cascade(label='Sobre', menu=menu_item2)
+        # barra_menu.add_cascade(label='Relatórios', menu=menu_item2)
 
         menu_item1.add_command(label='Sair', command=sair)
         menu_item1.add_command(label='Limpar Tela', command=self.limpar_tela)
-        menu_item2.add_command(label='Ficha da Operação', command=self.relatorio_operacao)
+        menu_item2.add_command(label='Sobre a Versão')
+        # menu_item2.add_command(label='Ficha da Operação', command=self.relatorio_operacao)
 
 aplicativo()
