@@ -1,15 +1,17 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import tix
+from tkinter import scrolledtext
 # from tkcalendar import Calendar
 import sqlite3
 # from datetime import date
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter, A4
-from reportlab.pdfbase import pdfmetrics
-from reportlab.platypus import SimpleDocTemplate, Image
-import webbrowser
+# from reportlab.pdfgen import canvas
+# from reportlab.lib.pagesizes import letter, A4
+# from reportlab.pdfbase import pdfmetrics
+# from reportlab.platypus import SimpleDocTemplate, Image
+# import webbrowser
 
-janela = Tk()
+janela = tix.Tk()
 
 '''class relatorios():
     def imprimir_operacao(self):
@@ -244,6 +246,13 @@ class aplicativo(funcoes):
         self.btn_apagar = Button(self.frame_1, text='Apagar', bd=2, bg='#107db2', fg='white', font=('verdana', 8, 'bold'), command=self.apagar_operacao)
         self.btn_apagar.place(relx=0.8, rely=0.1, relwidth=0.1, relheight=0.15)
 
+        # BALÕES =================================================================================
+
+        # balão do botão buscar
+        txt_balao_buscar = 'Informe o código do ativo que deseja pesquisar'
+        self.balao_buscar = tix.Balloon(self.frame_1)
+        self.balao_buscar.bind_widget(self.btn_buscar, balloonmsg=txt_balao_buscar)
+
         # LABELS =================================================================================
 
         # criação do label ID operação
@@ -320,13 +329,10 @@ class aplicativo(funcoes):
         self.label_tipo_operacao = Label(self.frame_1, text='Tipo de Operação', bg='#dfe3ee', fg='#1e3743')
         self.label_tipo_operacao.place(relx=0.5, rely=0.54)
 
-        self.entrada_tipo_operacao = Entry(self.frame_1)
-        self.entrada_tipo_operacao.place(relx=0.5, rely=0.64, relwidth=0.4)
-
-        '''lista_operacoes = ['Compra', 'Venda']
+        lista_operacoes = ['Compra', 'Venda']
         self.entrada_tipo_operacao = ttk.Combobox(self.frame_1, values=lista_operacoes)
         self.entrada_tipo_operacao.set('Compra')
-        self.entrada_tipo_operacao.place(relx=0.5, rely=0.64, relwidth=0.4)'''
+        self.entrada_tipo_operacao.place(relx=0.5, rely=0.64, relwidth=0.4)
 
         # criação do label taxa corretagem
         self.label_taxa_corretagem = Label(self.frame_1, text='Taxa Corretagem', bg='#dfe3ee', fg='#1e3743')
