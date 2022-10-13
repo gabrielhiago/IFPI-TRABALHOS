@@ -1,6 +1,5 @@
 from tkinter import *
 from tkinter import ttk
-from tkinter import tix
 from tkinter import scrolledtext
 # from tkcalendar import Calendar
 import sqlite3
@@ -11,7 +10,7 @@ import sqlite3
 # from reportlab.platypus import SimpleDocTemplate, Image
 # import webbrowser
 
-janela = tix.Tk()
+janela = Tk()
 
 '''class relatorios():
     def imprimir_operacao(self):
@@ -74,10 +73,6 @@ class funcoes:
         self.entrada_data.delete(0, END)
         self.entrada_qtd_acoes.delete(0, END)
         self.entrada_valor_unitario.delete(0, END)
-        '''self.entrada_dia.delete(0, END)
-        self.entrada_mes.delete(0, END)
-        self.entrada_ano.delete(0, END)'''
-        self.entrada_tipo_operacao.delete(0, END)
         self.entrada_taxa_corretagem.delete(0, END)
         self.entrada_taxa_b3.delete(0, END)
 
@@ -156,7 +151,7 @@ class funcoes:
             self.entrada_data.insert(END, col3)
             self.entrada_qtd_acoes.insert(END, col4)
             self.entrada_valor_unitario.insert(END, col5)
-            self.entrada_tipo_operacao.insert(END, col6)
+            self.entrada_tipo_operacao.set(col6)
             self.entrada_taxa_corretagem.insert(END, col7)
             self.entrada_taxa_b3.insert(END, col8)
 
@@ -225,62 +220,68 @@ class aplicativo(funcoes):
         self.frame_2.place(relx=0.02, rely=0.5, relwidth=0.96, relheight=0.46)
 
     def widgets_frame_1(self):
+        # ABAS =================================================================================
+        self.abas = ttk.Notebook(self.frame_1)
+        self.aba1 = Frame(self.abas)
+        self.aba2 = Frame(self.abas)
+
+        self.aba1.configure(background='#dfe3ee')
+        self.aba2.configure(background='#dfe3ee')
+
+        self.abas.add(self.aba1, text='Aba 1')
+        self.abas.add(self.aba2, text='Aba 2')
+
+        self.abas.place(relx=0, rely=0, relwidth=1.001, relheight=1.01)
+
         # BOTÕES =================================================================================
         # criação do botão limpar
-        self.btn_limpar = Button(self.frame_1, text='Limpar', bd=2, bg='#107db2', fg='white', font=('verdana', 8, 'bold'), command=self.limpar_tela)
+        self.btn_limpar = Button(self.aba1, text='Limpar', bd=2, bg='#107db2', fg='white', font=('verdana', 8, 'bold'), command=self.limpar_tela)
         self.btn_limpar.place(relx=0.3, rely=0.1, relwidth=0.1, relheight=0.15)
 
         # criação do botão buscar
-        self.btn_buscar = Button(self.frame_1, text='Buscar', bd=2, bg='#107db2', fg='white', font=('verdana', 8, 'bold'),command=self.buscar_operacao)
+        self.btn_buscar = Button(self.aba1, text='Buscar', bd=2, bg='#107db2', fg='white', font=('verdana', 8, 'bold'),command=self.buscar_operacao)
         self.btn_buscar.place(relx=0.4, rely=0.1, relwidth=0.1, relheight=0.15)
 
         # criação do botão novo
-        self.btn_guardar = Button(self.frame_1, text='Guardar', bd=2, bg='#107db2', fg='white', font=('verdana', 8, 'bold'), command=self.adicionar_operacao)
+        self.btn_guardar = Button(self.aba1, text='Guardar', bd=2, bg='#107db2', fg='white', font=('verdana', 8, 'bold'), command=self.adicionar_operacao)
         self.btn_guardar.place(relx=0.6, rely=0.1, relwidth=0.1, relheight=0.15)
 
         # criação do botão alterar
-        self.btn_alterar = Button(self.frame_1, text='Alterar', bd=2, bg='#107db2', fg='white', font=('verdana', 8, 'bold'), command=self.alterar_operacao)
+        self.btn_alterar = Button(self.aba1, text='Alterar', bd=2, bg='#107db2', fg='white', font=('verdana', 8, 'bold'), command=self.alterar_operacao)
         self.btn_alterar.place(relx=0.7, rely=0.1, relwidth=0.1, relheight=0.15)
 
         # criação do botão apagar
-        self.btn_apagar = Button(self.frame_1, text='Apagar', bd=2, bg='#107db2', fg='white', font=('verdana', 8, 'bold'), command=self.apagar_operacao)
+        self.btn_apagar = Button(self.aba1, text='Apagar', bd=2, bg='#107db2', fg='white', font=('verdana', 8, 'bold'), command=self.apagar_operacao)
         self.btn_apagar.place(relx=0.8, rely=0.1, relwidth=0.1, relheight=0.15)
-
-        # BALÕES =================================================================================
-
-        # balão do botão buscar
-        txt_balao_buscar = 'Informe o código do ativo que deseja pesquisar'
-        self.balao_buscar = tix.Balloon(self.frame_1)
-        self.balao_buscar.bind_widget(self.btn_buscar, balloonmsg=txt_balao_buscar)
 
         # LABELS =================================================================================
 
         # criação do label ID operação
-        self.label_id_operacao = Label(self.frame_1, text='ID Oper.', bg='#dfe3ee', fg='#1e3743')
+        self.label_id_operacao = Label(self.aba1, text='ID Oper.', bg='#dfe3ee', fg='#1e3743')
         self.label_id_operacao.place(relx=0.19, rely=0.05)
 
-        self.entrada_id_operacao = Entry(self.frame_1)
+        self.entrada_id_operacao = Entry(self.aba1)
         self.entrada_id_operacao.place(relx=0.19, rely=0.15, relwidth=0.10)
 
         # criação do label código ativo
-        self.label_codigo_ativo = Label(self.frame_1, text='Cód. Ativo', bg='#dfe3ee', fg='#1e3743')
+        self.label_codigo_ativo = Label(self.aba1, text='Cód. Ativo', bg='#dfe3ee', fg='#1e3743')
         self.label_codigo_ativo.place(relx=0.05, rely=0.05)
 
-        self.entrada_codigo_ativo = Entry(self.frame_1)
+        self.entrada_codigo_ativo = Entry(self.aba1)
         self.entrada_codigo_ativo.place(relx=0.05, rely=0.15, relwidth=0.13)
 
         # criação do label quantidade de ações
-        self.label_qtd_acoes = Label(self.frame_1, text='Quantidade de Ações', bg='#dfe3ee', fg='#1e3743')
+        self.label_qtd_acoes = Label(self.aba1, text='Quantidade de Ações', bg='#dfe3ee', fg='#1e3743')
         self.label_qtd_acoes.place(relx=0.05, rely=0.31)
 
-        self.entrada_qtd_acoes = Entry(self.frame_1)
+        self.entrada_qtd_acoes = Entry(self.aba1)
         self.entrada_qtd_acoes.place(relx=0.05, rely=0.41, relwidth=0.4)
 
         # criação do label valor unitário
-        self.label_valor_unitario = Label(self.frame_1, text='Valor Unitário', bg='#dfe3ee', fg='#1e3743')
+        self.label_valor_unitario = Label(self.aba1, text='Valor Unitário', bg='#dfe3ee', fg='#1e3743')
         self.label_valor_unitario.place(relx=0.5, rely=0.31)
 
-        self.entrada_valor_unitario = Entry(self.frame_1)
+        self.entrada_valor_unitario = Entry(self.aba1)
         self.entrada_valor_unitario.place(relx=0.5, rely=0.41, relwidth=0.4)
 
         '''criação do label dia
@@ -291,10 +292,10 @@ class aplicativo(funcoes):
         self.entrada_dia.place(relx=0.05, rely=0.64, relwidth=0.08)'''
 
         # criação do label data
-        self.label_data = Label(self.frame_1, text='Data', bg='#dfe3ee', fg='#1e3743')
+        self.label_data = Label(self.aba1, text='Data', bg='#dfe3ee', fg='#1e3743')
         self.label_data.place(relx=0.05, rely=0.54)
 
-        self.entrada_data = Entry(self.frame_1)
+        self.entrada_data = Entry(self.aba1)
         self.entrada_data.place(relx=0.05, rely=0.64, relwidth=0.4)
 
         # self.data_operacao = date.strftime(self.entrada_data.get_date(), '%Y-%m-%d')
@@ -326,26 +327,27 @@ class aplicativo(funcoes):
         self.data_operacao = f'{self.entrada_ano.get()}-{self.entrada_mes.get()}-{self.entrada_dia.get()}'''
 
         # criação do label tipo de operação
-        self.label_tipo_operacao = Label(self.frame_1, text='Tipo de Operação', bg='#dfe3ee', fg='#1e3743')
+        self.label_tipo_operacao = Label(self.aba1, text='Tipo de Operação', bg='#dfe3ee', fg='#1e3743')
         self.label_tipo_operacao.place(relx=0.5, rely=0.54)
 
-        lista_operacoes = ['Compra', 'Venda']
-        self.entrada_tipo_operacao = ttk.Combobox(self.frame_1, values=lista_operacoes)
-        self.entrada_tipo_operacao.set('Compra')
-        self.entrada_tipo_operacao.place(relx=0.5, rely=0.64, relwidth=0.4)
+        self.entrada_tipo_operacao = StringVar(self.aba1)
+        self.opcoes = ('COMPRA', 'VENDA')
+        self.entrada_tipo_operacao.set('COMPRA')
+        self.popupmenu = OptionMenu(self.aba1, self.entrada_tipo_operacao, *self.opcoes)
+        self.popupmenu.place(relx=0.5, rely=0.64, relwidth=0.4, relheight=0.13)
 
         # criação do label taxa corretagem
-        self.label_taxa_corretagem = Label(self.frame_1, text='Taxa Corretagem', bg='#dfe3ee', fg='#1e3743')
+        self.label_taxa_corretagem = Label(self.aba1, text='Taxa Corretagem', bg='#dfe3ee', fg='#1e3743')
         self.label_taxa_corretagem.place(relx=0.05, rely=0.78)
 
-        self.entrada_taxa_corretagem = Entry(self.frame_1)
+        self.entrada_taxa_corretagem = Entry(self.aba1)
         self.entrada_taxa_corretagem.place(relx=0.05, rely=0.88, relwidth=0.2)
 
         # criação do label taxa B3
-        self.label_taxa_b3 = Label(self.frame_1, text='Taxa B3', bg='#dfe3ee', fg='#1e3743')
+        self.label_taxa_b3 = Label(self.aba1, text='Taxa B3', bg='#dfe3ee', fg='#1e3743')
         self.label_taxa_b3.place(relx=0.5, rely=0.78)
 
-        self.entrada_taxa_b3 = Entry(self.frame_1)
+        self.entrada_taxa_b3 = Entry(self.aba1)
         self.entrada_taxa_b3.place(relx=0.5, rely=0.88, relwidth=0.2)
 
     def widgets_frame_2(self):
